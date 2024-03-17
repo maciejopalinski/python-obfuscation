@@ -2,7 +2,6 @@
 
 import unittest
 import subprocess
-import io
 import obf, deobf
 
 class TestSimple(unittest.TestCase):
