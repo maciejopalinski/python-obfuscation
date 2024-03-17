@@ -58,7 +58,7 @@ def iteration(x: str, current_iter: int, debug: bool, debug_dir: str | None, max
 
     elapsed_ms = (time_stop - time_start) // 1_000_000
     if debug:
-        print("Iteration {}: {}, took {} ms".format(current_iter, f.__name__, elapsed_ms), file=sys.stderr)
+        sys.stderr.write("Iteration {}: {}, took {} ms\n".format(current_iter, f.__name__, elapsed_ms))
 
         if debug_dir:
             debug_file = open(os.path.join(debug_dir, str(current_iter) + ".py"), "w")
@@ -77,9 +77,11 @@ def cli(input_filename: str, output_filename: str, debug: bool, debug_dir: str |
     input_file = sys.stdin
     if input_filename not in ["-", "stdin"]:
         input_file = open(input_filename, "r")
-    
+
     input_source = input_file.read()
-    input_file.close()
+
+    if input_filename not in ["-", "stdin"]:
+        input_file.close()
 
     ds = iteration(input_source, 1, debug, debug_dir, max_iter)
     ds = remove_comments(ds)
@@ -94,8 +96,7 @@ def cli(input_filename: str, output_filename: str, debug: bool, debug_dir: str |
         output_file.close()
 
 def gui(debug: bool):
-    print("Work in progress!", file=sys.stderr)
-    pass
+    raise Exception("work in progress!")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="A script to deobfuscate Python scripts")
@@ -108,14 +109,14 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.debug:
-        print("args:", args, file=sys.stderr)
+        sys.stderr.write("args: {}\n".format(args))
 
-    # try:
+    try:
         if args.gui:
             gui(args.debug)
         elif args.input:
             cli(args.input, args.output, args.debug, args.debug_dir, args.max_iter)
         else:
             raise Exception("no input file")
-    # except Exception as e:
-    #     parser.error(str(e))
+    except Exception as e:
+        parser.error(str(e))
